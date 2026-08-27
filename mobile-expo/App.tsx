@@ -14,11 +14,13 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 import { AssetPalette } from './src/components/AssetPalette';
+import { DynamicTerrain } from './src/components/DynamicTerrain';
 import { GridOverlay } from './src/components/GridOverlay';
 import { PlacedAssetView } from './src/components/PlacedAssetView';
 import { Toolbar } from './src/components/Toolbar';
 import { CITY_ASSET_BY_ID, CITY_ASSETS } from './src/data/assets';
-import { createSampleLayout } from './src/data/sampleLayout';
+import { createSampleLayout, createStarterLayout } from './src/data/sampleLayout';
+import { buildTerrainGeometry, snapNetworkItem } from './src/data/terrainEngine';
 import { loadCityLayout, saveCityLayout } from './src/storage';
 import type {
   AssetCategory,
@@ -98,7 +100,7 @@ export default function App() {
   );
 
   const applyLayout = useCallback((snapshot: CityLayoutSnapshot | null) => {
-    const nextItems = snapshot ? sanitizeItems(snapshot.items) : createSampleLayout();
+    const nextItems = snapshot ? sanitizeItems(snapshot.items) : createStarterLayout();
     setItems(nextItems);
     setShowGrid(snapshot?.showGrid !== false);
     setShowReference(Boolean(snapshot?.showReference));
@@ -114,12 +116,12 @@ export default function App() {
         const saved = await loadCityLayout();
         if (!active) return;
         applyLayout(saved);
-        setStatus(saved ? '저장 도시 불러옴' : '샘플 도시 준비됨');
+        setStatus(saved ? '저장 도시 불러옴' : '분수공원 기본 풀밭 준비됨');
       } catch (error) {
         console.warn('Could not load city layout', error);
         if (!active) return;
         applyLayout(null);
-        setStatus('샘플 도시 준비됨');
+        setStatus('분수공원 기본 풀밭 준비됨');
       } finally {
         if (active) setHydrated(true);
       }
@@ -131,7 +133,7 @@ export default function App() {
 
   const snapshot = useMemo<CityLayoutSnapshot>(
     () => ({
-      version: 1,
+      version: 3,
       items,
       showGrid,
       showReference,
@@ -161,6 +163,10 @@ export default function App() {
   const activeAsset = selectedAssetId
     ? CITY_ASSET_BY_ID.get(selectedAssetId) ?? null
     : null;
+  const terrainGeometry = useMemo(
+    () => buildTerrainGeometry(items, CITY_ASSET_BY_ID),
+    [items],
+  );
 
   const selectAsset = useCallback((assetId: string) => {
     setSelectedAssetId(assetId);
@@ -191,7 +197,7 @@ export default function App() {
         0,
         BOARD_HEIGHT - asset.defaultHeight,
       );
-      const next: PlacedAsset = {
+      const candidate: PlacedAsset = {
         id: makeId(),
         assetId: asset.id,
         x,
@@ -199,12 +205,22 @@ export default function App() {
         flipped: false,
         z: zCounter.current++,
       };
+      const networkSnap = snapNetworkItem(candidate, asset, items, CITY_ASSET_BY_ID);
+      const next = {
+        ...candidate,
+        x: networkSnap.x,
+        y: networkSnap.y,
+      };
       setItems((current) => [...current, next]);
       setSelectedItemId(next.id);
       setSelectedAssetId(null);
-      showStatus('에셋 배치됨');
+      showStatus(
+        networkSnap.snapped
+          ? '에셋 배치됨 · 인접 네트워크에 연결'
+          : '에셋 배치됨 · 지형 재계산',
+      );
     },
-    [selectedAssetId, showStatus],
+    [items, selectedAssetId, showStatus],
   );
 
   const updateItem = useCallback(
@@ -218,22 +234,37 @@ export default function App() {
 
   const moveItem = useCallback(
     (itemId: string, x: number, y: number) => {
-      updateItem(itemId, (item) => ({ ...item, x, y }));
+      const item = items.find((candidate) => candidate.id === itemId);
+      if (!item) return;
+      const asset = CITY_ASSET_BY_ID.get(item.assetId);
+      if (!asset) return;
+      const candidate = { ...item, x, y };
+      const networkSnap = snapNetworkItem(candidate, asset, items, CITY_ASSET_BY_ID);
+      updateItem(itemId, (current) => ({
+        ...current,
+        x: networkSnap.x,
+        y: networkSnap.y,
+      }));
+      showStatus(
+        networkSnap.snapped
+          ? '이동됨 · 인접 네트워크에 연결'
+          : '이동됨 · 주변 지형 재계산',
+      );
     },
-    [updateItem],
+    [items, showStatus, updateItem],
   );
 
   const flipSelected = useCallback(() => {
     if (!selectedItemId) return;
     updateItem(selectedItemId, (item) => ({ ...item, flipped: !item.flipped }));
-    showStatus('좌우 반전됨');
+    showStatus('좌우 반전됨 · 연결 지형 재계산');
   }, [selectedItemId, showStatus, updateItem]);
 
   const duplicateSelected = useCallback(() => {
     if (!selectedItem) return;
     const asset = CITY_ASSET_BY_ID.get(selectedItem.assetId);
     if (!asset) return;
-    const duplicate: PlacedAsset = {
+    const candidate: PlacedAsset = {
       ...selectedItem,
       id: makeId(),
       x: clamp(
@@ -248,10 +279,12 @@ export default function App() {
       ),
       z: zCounter.current++,
     };
+    const networkSnap = snapNetworkItem(candidate, asset, items, CITY_ASSET_BY_ID);
+    const duplicate = { ...candidate, x: networkSnap.x, y: networkSnap.y };
     setItems((current) => [...current, duplicate]);
     setSelectedItemId(duplicate.id);
-    showStatus('복제됨');
-  }, [selectedItem, showStatus]);
+    showStatus('복제됨 · 지형 재계산');
+  }, [items, selectedItem, showStatus]);
 
   const bringFront = useCallback(() => {
     if (!selectedItemId) return;
@@ -268,7 +301,7 @@ export default function App() {
     if (!selectedItemId) return;
     setItems((current) => current.filter((item) => item.id !== selectedItemId));
     setSelectedItemId(null);
-    showStatus('삭제됨');
+    showStatus('삭제됨 · 해당 지형은 풀밭으로 복구');
   }, [selectedItemId, showStatus]);
 
   const loadSaved = useCallback(() => {
@@ -307,17 +340,18 @@ export default function App() {
   }, [showStatus]);
 
   const resetCity = useCallback(() => {
-    Alert.alert('도시 초기화', '배치된 에셋을 모두 지울까요?', [
+    Alert.alert('도시 초기화', '분수공원만 남긴 기본 풀밭으로 되돌릴까요?', [
       { text: '취소', style: 'cancel' },
       {
         text: '초기화',
         style: 'destructive',
         onPress: () => {
-          setItems([]);
+          const starter = createStarterLayout();
+          setItems(starter);
           setSelectedAssetId(null);
           setSelectedItemId(null);
-          zCounter.current = 1;
-          showStatus('초기화됨');
+          zCounter.current = 20;
+          showStatus('기본 풀밭으로 초기화됨');
         },
       },
     ]);
@@ -376,7 +410,7 @@ export default function App() {
         active: showReference,
         onPress: () => setShowReference((value) => !value),
       },
-      { id: 'sample', label: '🏙 샘플', onPress: loadSample },
+      { id: 'sample', label: '🏙 예시 배치', onPress: loadSample },
       { id: 'save', label: '💾 저장', onPress: saveNow },
       { id: 'load', label: '↻ 불러오기', onPress: loadSaved },
       { id: 'reset', label: '초기화', danger: true, onPress: resetCity },
@@ -404,7 +438,7 @@ export default function App() {
       : '선택 모드';
   const detailLabel = selectedItem
     ? `x ${Math.round(selectedItem.x)} · y ${Math.round(selectedItem.y)}${selectedItem.flipped ? ' · 좌우 반전' : ''}`
-    : '배치된 에셋을 눌러 편집';
+    : `자동 연결 ${terrainGeometry.stats.autoConnections} · 진입로 ${terrainGeometry.stats.driveways} · 변형 지형 ${terrainGeometry.stats.terrainRegions}`;
 
   return (
     <SafeAreaView style={styles.root}>
@@ -413,7 +447,7 @@ export default function App() {
         <View style={styles.headerText}>
           <Text style={styles.headerTitle}>소비 도시 빌더</Text>
           <Text style={styles.headerSubtitle}>
-            선택 → 배치 → 드래그 이동 → 좌우 반전
+            풀밭에서 시작 · 배치 관계를 읽어 도로·진입로·부지를 재생성 · 좌우 반전
           </Text>
         </View>
         <View style={styles.statusBadge}>
@@ -460,6 +494,12 @@ export default function App() {
                   onPress={handleBoardPress}
                   style={styles.board}
                 >
+                  <Image
+                    pointerEvents="none"
+                    source={require('./assets/grass_field.jpg')}
+                    resizeMode="stretch"
+                    style={styles.grassBackground}
+                  />
                   {showReference ? (
                     <Image
                       pointerEvents="none"
@@ -468,6 +508,11 @@ export default function App() {
                       style={styles.referenceImage}
                     />
                   ) : null}
+                  <DynamicTerrain
+                    geometry={terrainGeometry}
+                    height={BOARD_HEIGHT}
+                    width={BOARD_WIDTH}
+                  />
                   {showGrid ? (
                     <GridOverlay width={BOARD_WIDTH} height={BOARD_HEIGHT} />
                   ) : null}
@@ -495,7 +540,7 @@ export default function App() {
 
                   <View pointerEvents="none" style={styles.canvasTip}>
                     <Text style={styles.canvasTipText}>
-                      빈 곳을 눌러 배치 · 에셋을 드래그해 이동
+                      빈 곳을 눌러 배치 · 추가/이동/삭제마다 전체 지형과 연결망 재계산
                     </Text>
                   </View>
                 </Pressable>
@@ -507,7 +552,7 @@ export default function App() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          캔버스 {BOARD_WIDTH} × {BOARD_HEIGHT} · {GRID_SIZE}px 스냅 · 회전/크기 변경 없음
+          캔버스 {BOARD_WIDTH} × {BOARD_HEIGHT} · {GRID_SIZE}px 스냅 · 이웃 반응형 동적 지형
         </Text>
       </View>
     </SafeAreaView>
@@ -623,7 +668,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#365d3f',
     borderRadius: 12,
-    backgroundColor: '#69b54e',
+    backgroundColor: '#8acb2e',
+  },
+  grassBackground: {
+    ...StyleSheet.absoluteFillObject,
+    width: BOARD_WIDTH,
+    height: BOARD_HEIGHT,
   },
   referenceImage: {
     ...StyleSheet.absoluteFillObject,

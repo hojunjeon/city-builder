@@ -6,9 +6,11 @@ import {
   PanResponder,
   PanResponderGestureState,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 
+import { PROCEDURAL_ASSET_IDS } from '../data/terrainEngine';
 import type { CityAsset, PlacedAsset } from '../types';
 
 type Props = {
@@ -40,6 +42,8 @@ export function PlacedAssetView({
 }: Props) {
   const position = useRef(new Animated.ValueXY({ x: item.x, y: item.y })).current;
   const dragStart = useRef({ x: item.x, y: item.y });
+  const procedural = PROCEDURAL_ASSET_IDS.has(asset.id);
+  const showObjectSprite = !procedural || asset.id === 'rail_crossing';
 
   useEffect(() => {
     position.setValue({ x: item.x, y: item.y });
@@ -49,15 +53,20 @@ export function PlacedAssetView({
     () =>
       PanResponder.create({
         onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: (_event: GestureResponderEvent, gesture: PanResponderGestureState) =>
-          Math.abs(gesture.dx) + Math.abs(gesture.dy) > 2,
+        onMoveShouldSetPanResponder: (
+          _event: GestureResponderEvent,
+          gesture: PanResponderGestureState,
+        ) => Math.abs(gesture.dx) + Math.abs(gesture.dy) > 2,
         onPanResponderGrant: (event: GestureResponderEvent) => {
           event.stopPropagation?.();
           dragStart.current = { x: item.x, y: item.y };
           onSelect(item.id);
           onDragStateChange(true);
         },
-        onPanResponderMove: (_event: GestureResponderEvent, gesture: PanResponderGestureState) => {
+        onPanResponderMove: (
+          _event: GestureResponderEvent,
+          gesture: PanResponderGestureState,
+        ) => {
           const x = clamp(
             dragStart.current.x + gesture.dx,
             0,
@@ -70,7 +79,10 @@ export function PlacedAssetView({
           );
           position.setValue({ x, y });
         },
-        onPanResponderRelease: (_event: GestureResponderEvent, gesture: PanResponderGestureState) => {
+        onPanResponderRelease: (
+          _event: GestureResponderEvent,
+          gesture: PanResponderGestureState,
+        ) => {
           const rawX = clamp(
             dragStart.current.x + gesture.dx,
             0,
@@ -124,20 +136,33 @@ export function PlacedAssetView({
         {
           width: asset.defaultWidth,
           height: asset.defaultHeight,
-          zIndex: item.z,
+          zIndex: item.z + 100,
           transform: position.getTranslateTransform(),
         },
       ]}
     >
-      <View style={[styles.frame, selected && styles.frameSelected]}>
-        <Image
-          source={asset.source}
-          resizeMode="contain"
-          style={[
-            styles.image,
-            { transform: [{ scaleX: item.flipped ? -1 : 1 }] },
-          ]}
-        />
+      <View
+        style={[
+          styles.frame,
+          procedural && styles.proceduralFrame,
+          selected && styles.frameSelected,
+        ]}
+      >
+        {showObjectSprite ? (
+          <Image
+            source={asset.objectSource}
+            resizeMode="contain"
+            style={[
+              styles.image,
+              { transform: [{ scaleX: item.flipped ? -1 : 1 }] },
+            ]}
+          />
+        ) : null}
+        {procedural && selected ? (
+          <View pointerEvents="none" style={styles.proceduralLabel}>
+            <Text style={styles.proceduralLabelText}>{asset.label}</Text>
+          </View>
+        ) : null}
       </View>
     </Animated.View>
   );
@@ -156,6 +181,10 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
     borderRadius: 9,
   },
+  proceduralFrame: {
+    borderRadius: 18,
+    backgroundColor: 'transparent',
+  },
   frameSelected: {
     borderWidth: 2,
     borderColor: '#ffffff',
@@ -169,5 +198,25 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
+  },
+  proceduralLabel: {
+    position: 'absolute',
+    left: '20%',
+    right: '20%',
+    top: '38%',
+    minHeight: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.85)',
+    borderRadius: 999,
+    backgroundColor: 'rgba(25,67,39,0.46)',
+  },
+  proceduralLabelText: {
+    color: '#ffffff',
+    fontSize: 8,
+    fontWeight: '800',
+    textAlign: 'center',
   },
 });

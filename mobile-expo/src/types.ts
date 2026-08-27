@@ -7,6 +7,7 @@ export type CityAsset = {
   label: string;
   category: AssetCategory;
   source: ImageSourcePropType;
+  objectSource: ImageSourcePropType;
   defaultWidth: number;
   defaultHeight: number;
 };
@@ -21,7 +22,7 @@ export type PlacedAsset = {
 };
 
 export type CityLayoutSnapshot = {
-  version: 1;
+  version: 3;
   items: PlacedAsset[];
   showGrid: boolean;
   showReference: boolean;

@@ -1,6 +1,6 @@
 {
   "name": "spend-city-builder",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "private": true,
   "main": "index.ts",
   "scripts": {
@@ -19,7 +19,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.2",
-    "react-native-web": "~0.21.0"
+    "react-native-web": "~0.21.0",
+    "react-native-svg": "15.15.4"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",

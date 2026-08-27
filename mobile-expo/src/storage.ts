@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { CityLayoutSnapshot } from './types';
 
-const STORAGE_KEY = 'spend-city-builder-v1';
+const STORAGE_KEY = 'spend-city-builder-v3-dynamic-terrain';
 
 export async function saveCityLayout(snapshot: CityLayoutSnapshot): Promise<void> {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
@@ -19,11 +19,14 @@ export async function loadCityLayout(): Promise<CityLayoutSnapshot | null> {
   if (!Array.isArray(candidate.items)) return null;
 
   return {
-    version: 1,
+    version: 3,
     items: candidate.items,
     showGrid: candidate.showGrid !== false,
     showReference: Boolean(candidate.showReference),
-    savedAt: typeof candidate.savedAt === 'string' ? candidate.savedAt : new Date().toISOString(),
+    savedAt:
+      typeof candidate.savedAt === 'string'
+        ? candidate.savedAt
+        : new Date().toISOString(),
   };
 }
 
