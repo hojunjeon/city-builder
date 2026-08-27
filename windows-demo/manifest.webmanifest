@@ -1,0 +1,10 @@
+{
+  "name": "소비 도시 빌더",
+  "short_name": "도시 빌더",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#eef2ed",
+  "theme_color": "#183122",
+  "icons": []
+}

@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "소비 도시 빌더",
+    "slug": "spend-city-builder",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#eef2ed"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#eef2ed"
+      },
+      "package": "com.a408.spendcitybuilder"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.a408.spendcitybuilder"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}

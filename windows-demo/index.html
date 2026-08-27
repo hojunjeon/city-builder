@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#183122" />
+  <title>소비 도시 빌더</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div>
+        <h1>소비 도시 빌더</h1>
+        <p>에셋 선택 → 캔버스 클릭 배치 → 드래그 이동 → 좌우 반전</p>
+      </div>
+      <div id="saveStatus" class="status-badge">준비됨</div>
+    </header>
+
+    <section class="toolbar" aria-label="도시 편집 도구">
+      <button id="selectModeBtn" type="button">↖ 선택 모드</button>
+      <button id="flipBtn" type="button" disabled>⇆ 좌우 반전</button>
+      <button id="duplicateBtn" type="button" disabled>⧉ 복제</button>
+      <button id="frontBtn" type="button" disabled>⬆ 앞으로</button>
+      <button id="backBtn" type="button" disabled>⬇ 뒤로</button>
+      <button id="deleteBtn" type="button" class="danger" disabled>⌫ 삭제</button>
+      <span class="toolbar-separator"></span>
+      <button id="gridBtn" type="button" class="active"># 격자</button>
+      <button id="referenceBtn" type="button">▧ 참고 이미지</button>
+      <button id="sampleBtn" type="button">🏙 샘플 배치</button>
+      <span class="toolbar-separator"></span>
+      <button id="saveBtn" type="button">💾 저장</button>
+      <button id="loadBtn" type="button">↻ 불러오기</button>
+      <button id="exportBtn" type="button">⇩ JSON</button>
+      <button id="importBtn" type="button">⇧ JSON</button>
+      <button id="resetBtn" type="button" class="danger-outline">초기화</button>
+      <input id="importInput" type="file" accept="application/json,.json" hidden />
+    </section>
+
+    <main class="main-layout">
+      <aside class="palette-panel">
+        <div class="panel-heading">
+          <div>
+            <strong>에셋</strong>
+            <small id="paletteHint">배치할 에셋을 선택하세요.</small>
+          </div>
+          <div class="category-tabs" role="tablist" aria-label="에셋 분류">
+            <button type="button" class="category-tab active" data-category="all">전체</button>
+            <button type="button" class="category-tab" data-category="road">도로</button>
+            <button type="button" class="category-tab" data-category="nature">자연</button>
+            <button type="button" class="category-tab" data-category="building">건물</button>
+          </div>
+        </div>
+        <div id="assetPalette" class="asset-palette" aria-label="배치 가능한 도시 에셋"></div>
+      </aside>
+
+      <section class="workspace">
+        <div class="workspace-topline">
+          <div id="modeText"><strong>모드:</strong> 선택</div>
+          <div id="selectionText">선택된 오브젝트 없음</div>
+        </div>
+        <div id="canvasViewport" class="canvas-viewport">
+          <div id="cityCanvas" class="city-canvas grid-on" tabindex="0" aria-label="도시 제작 캔버스">
+            <img id="referenceImage" class="reference-image" src="assets/city_reference.jpg" alt="도시 배치 참고 이미지" draggable="false" />
+            <div id="placedLayer" class="placed-layer"></div>
+            <div class="canvas-tip">빈 곳을 클릭해 배치 · 배치된 에셋을 드래그해 이동</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>단축키: <kbd>F</kbd> 반전 · <kbd>Delete</kbd> 삭제 · <kbd>Esc</kbd> 선택 모드 · <kbd>Ctrl+S</kbd> 저장</span>
+      <span>캔버스 960 × 540 · 16px 스냅</span>
+    </footer>
+  </div>
+
+  <script src="assets.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

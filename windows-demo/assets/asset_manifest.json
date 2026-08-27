@@ -1,0 +1,232 @@
+[
+  {
+    "id": "road_straight_a",
+    "label": "도로 직선 A",
+    "category": "road",
+    "file": "sprites/road_straight_a.png",
+    "sourceWidth": 243,
+    "sourceHeight": 169,
+    "defaultWidth": 154,
+    "defaultHeight": 107
+  },
+  {
+    "id": "road_straight_b",
+    "label": "도로 직선 B",
+    "category": "road",
+    "file": "sprites/road_straight_b.png",
+    "sourceWidth": 236,
+    "sourceHeight": 170,
+    "defaultWidth": 154,
+    "defaultHeight": 111
+  },
+  {
+    "id": "road_curve_a",
+    "label": "도로 곡선 A",
+    "category": "road",
+    "file": "sprites/road_curve_a.png",
+    "sourceWidth": 238,
+    "sourceHeight": 169,
+    "defaultWidth": 154,
+    "defaultHeight": 109
+  },
+  {
+    "id": "road_curve_b",
+    "label": "도로 곡선 B",
+    "category": "road",
+    "file": "sprites/road_curve_b.png",
+    "sourceWidth": 230,
+    "sourceHeight": 168,
+    "defaultWidth": 154,
+    "defaultHeight": 112
+  },
+  {
+    "id": "road_cross",
+    "label": "사거리",
+    "category": "road",
+    "file": "sprites/road_cross.png",
+    "sourceWidth": 234,
+    "sourceHeight": 171,
+    "defaultWidth": 154,
+    "defaultHeight": 113
+  },
+  {
+    "id": "road_dead_end",
+    "label": "회차로",
+    "category": "road",
+    "file": "sprites/road_dead_end.png",
+    "sourceWidth": 233,
+    "sourceHeight": 168,
+    "defaultWidth": 154,
+    "defaultHeight": 111
+  },
+  {
+    "id": "park_fountain",
+    "label": "분수 공원",
+    "category": "nature",
+    "file": "sprites/park_fountain.png",
+    "sourceWidth": 257,
+    "sourceHeight": 204,
+    "defaultWidth": 150,
+    "defaultHeight": 119
+  },
+  {
+    "id": "forest_pine",
+    "label": "침엽수 숲",
+    "category": "nature",
+    "file": "sprites/forest_pine.png",
+    "sourceWidth": 227,
+    "sourceHeight": 203,
+    "defaultWidth": 150,
+    "defaultHeight": 134
+  },
+  {
+    "id": "forest_broadleaf",
+    "label": "활엽수 숲",
+    "category": "nature",
+    "file": "sprites/forest_broadleaf.png",
+    "sourceWidth": 233,
+    "sourceHeight": 198,
+    "defaultWidth": 150,
+    "defaultHeight": 127
+  },
+  {
+    "id": "playground",
+    "label": "놀이터",
+    "category": "nature",
+    "file": "sprites/playground.png",
+    "sourceWidth": 233,
+    "sourceHeight": 176,
+    "defaultWidth": 150,
+    "defaultHeight": 113
+  },
+  {
+    "id": "rail_straight",
+    "label": "철길",
+    "category": "road",
+    "file": "sprites/rail_straight.png",
+    "sourceWidth": 231,
+    "sourceHeight": 175,
+    "defaultWidth": 154,
+    "defaultHeight": 117
+  },
+  {
+    "id": "rail_crossing",
+    "label": "철도 건널목",
+    "category": "road",
+    "file": "sprites/rail_crossing.png",
+    "sourceWidth": 248,
+    "sourceHeight": 195,
+    "defaultWidth": 154,
+    "defaultHeight": 121
+  },
+  {
+    "id": "house_red",
+    "label": "빨간 지붕 주택",
+    "category": "building",
+    "file": "sprites/house_red.png",
+    "sourceWidth": 250,
+    "sourceHeight": 230,
+    "defaultWidth": 148,
+    "defaultHeight": 136
+  },
+  {
+    "id": "house_blue",
+    "label": "파란 지붕 주택",
+    "category": "building",
+    "file": "sprites/house_blue.png",
+    "sourceWidth": 241,
+    "sourceHeight": 220,
+    "defaultWidth": 148,
+    "defaultHeight": 135
+  },
+  {
+    "id": "house_purple",
+    "label": "보라 지붕 주택",
+    "category": "building",
+    "file": "sprites/house_purple.png",
+    "sourceWidth": 232,
+    "sourceHeight": 214,
+    "defaultWidth": 148,
+    "defaultHeight": 137
+  },
+  {
+    "id": "shop_yellow",
+    "label": "노란 상점",
+    "category": "building",
+    "file": "sprites/shop_yellow.png",
+    "sourceWidth": 236,
+    "sourceHeight": 223,
+    "defaultWidth": 148,
+    "defaultHeight": 140
+  },
+  {
+    "id": "school",
+    "label": "학교",
+    "category": "building",
+    "file": "sprites/school.png",
+    "sourceWidth": 241,
+    "sourceHeight": 255,
+    "defaultWidth": 160,
+    "defaultHeight": 169
+  },
+  {
+    "id": "church",
+    "label": "교회",
+    "category": "building",
+    "file": "sprites/church.png",
+    "sourceWidth": 238,
+    "sourceHeight": 278,
+    "defaultWidth": 160,
+    "defaultHeight": 187
+  },
+  {
+    "id": "apartment",
+    "label": "아파트",
+    "category": "building",
+    "file": "sprites/apartment.png",
+    "sourceWidth": 237,
+    "sourceHeight": 265,
+    "defaultWidth": 160,
+    "defaultHeight": 179
+  },
+  {
+    "id": "hospital",
+    "label": "병원",
+    "category": "building",
+    "file": "sprites/hospital.png",
+    "sourceWidth": 262,
+    "sourceHeight": 262,
+    "defaultWidth": 160,
+    "defaultHeight": 160
+  },
+  {
+    "id": "fire_station",
+    "label": "소방서",
+    "category": "building",
+    "file": "sprites/fire_station.png",
+    "sourceWidth": 254,
+    "sourceHeight": 246,
+    "defaultWidth": 160,
+    "defaultHeight": 155
+  },
+  {
+    "id": "office",
+    "label": "사무실",
+    "category": "building",
+    "file": "sprites/office.png",
+    "sourceWidth": 262,
+    "sourceHeight": 284,
+    "defaultWidth": 160,
+    "defaultHeight": 173
+  },
+  {
+    "id": "shop_green",
+    "label": "초록 상점",
+    "category": "building",
+    "file": "sprites/shop_green.png",
+    "sourceWidth": 242,
+    "sourceHeight": 237,
+    "defaultWidth": 148,
+    "defaultHeight": 145
+  }
+]
